@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Ground
   - BackGround
+  - target_box
+  - LIMIT
+  - ki
   layers:
   - Default
   - TransparentFX
@@ -42,4 +45,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 3158442825
+    locked: 0
+  - name: targets
+    uniqueID: 1386933933
+    locked: 0
+  - name: Ki
+    uniqueID: 304833163
     locked: 0
