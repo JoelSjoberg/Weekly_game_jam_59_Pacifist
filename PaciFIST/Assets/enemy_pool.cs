@@ -14,7 +14,6 @@ public class enemy_pool : MonoBehaviour {
 
 
     float timer = 0f;
-    public float wave_freq = 3f;
 
     public int wave = 0;
 
@@ -77,6 +76,7 @@ public class enemy_pool : MonoBehaviour {
         }
     }
 
+
     List<GameObject> get_active_boxes()
     {
         List<GameObject> active_boxes = new List<GameObject>();
@@ -106,7 +106,7 @@ public class enemy_pool : MonoBehaviour {
     {
         timer += Time.deltaTime;
 
-        if (timer >= freqs[wave] && spawning)
+        if (timer >= freqs[wave] + Random.Range(0, 2) && spawning)
         {
             timer = 0;
             spawn_ki();
@@ -124,21 +124,27 @@ public class enemy_pool : MonoBehaviour {
     {
         for (int i = 0; i < pool.Count; i++)
         {
-            if(pool[i].activeInHierarchy) pool[i].SetActive(false);
+
+            if (pool[i].activeInHierarchy)
+            {
+                enemy_behavior e = pool[i].GetComponent<enemy_behavior>();
+                e.ani.Play("ki_peace");
+                StartCoroutine(e.die());
+            }
 
         }
     }
 
-    public void expand_target_boxes()
+    public void expand_target_boxes(int amount)
     {
         List<GameObject> boxes = get_active_boxes();
         int boxes_expanded = 0;
 
-        Vector3[] dirs = { Vector3.left, Vector3.right, Vector3.up };
+        Vector3[] dirs = { Vector3.left, Vector3.right, Vector3.up, Vector3.down};
 
         for(int i = 0; i < boxes.Count; i++)
         {
-            if (boxes_expanded < 3)
+            if (boxes_expanded < amount)
             {
                 for (int j = 0; j < dirs.Length; j++)
                 {
@@ -159,7 +165,7 @@ public class enemy_pool : MonoBehaviour {
     bool cast_ray(Vector3 from, Vector3 dir)
     {
         RaycastHit hit;
-        if (!Physics.Raycast(from, dir, out hit, 0.5f))
+        if (!Physics.Raycast(from, dir, out hit, 0.75f))
         {
             return true;
         }

@@ -21,7 +21,7 @@ public class cam_controll : MonoBehaviour {
 
     public void satis_shake()
     {
-        StartCoroutine(shake(0.1f, shake_intensity * 0.25f));
+        StartCoroutine(shake(0.1f, shake_intensity * 0.75f));
     }
 
     public void bad_shake()
@@ -32,6 +32,10 @@ public class cam_controll : MonoBehaviour {
     public void small_shake()
     {
         StartCoroutine(shake(0.2f, shake_intensity));
+    }
+    public void super_shake()
+    {
+        StartCoroutine(shake(1f, shake_intensity * 3f));
     }
 
     public void zoom(float mult)
