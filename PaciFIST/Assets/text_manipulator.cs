@@ -43,6 +43,7 @@ public class text_manipulator : MonoBehaviour {
         if(combo)
         {
             ui_text.text = player.combo + "";
+            
         }
         if (kyu_img)
         {
