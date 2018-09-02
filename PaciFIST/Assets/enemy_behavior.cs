@@ -10,6 +10,8 @@ public class enemy_behavior : MonoBehaviour {
 
     public Animator ani;
     SpriteRenderer sr;
+    AudioSource audio;
+    public List<AudioClip> sfx;
 
     private void Start()
     {
@@ -36,6 +38,7 @@ public class enemy_behavior : MonoBehaviour {
     {
         sr = GetComponent<SpriteRenderer>();
         ani = GetComponent<Animator>();
+        audio = GetComponent<AudioSource>();
         ani.Play("ki_spawn");
         dead = false;
         //StartCoroutine(spawn());
@@ -55,12 +58,16 @@ public class enemy_behavior : MonoBehaviour {
             Player_input p = other.transform.GetComponent<Player_input>();
             if(p.attacking)
             {
+                audio.clip = sfx[0];
+                audio.Play();
                 p.add_points((int) transform.position.y + 1);
                 StartCoroutine(die());
             }
             
             else
             {
+                audio.clip = sfx[1];
+                audio.Play();
                 p.take_damage();
                 StartCoroutine(die());
             }

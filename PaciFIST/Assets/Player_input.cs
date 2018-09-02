@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player_input : MonoBehaviour {
 
@@ -16,6 +18,9 @@ public class Player_input : MonoBehaviour {
     public int kyu = 0;
     public int points = 0; // incremented in enemy_behaviour
 
+    public int[] hp_s = { 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 10 };
+
+    public int curr_hp = 0;
     public float attack_speed = 0.2f;
     // cooldown between attacks
     public float cooldown = 3f;
@@ -28,11 +33,14 @@ public class Player_input : MonoBehaviour {
     cam_controll cam;
     SpriteRenderer sr;
     Animator ani;
+    AudioSource audio;
 
-   
+    public List<AudioClip> sfx;
 
-	// Use this for initialization
-	void Start () {
+    public int combo = 0;
+
+    // Use this for initialization
+    void Start () {
         rb = GetComponent<Rigidbody>();
         ep = FindObjectOfType<enemy_pool>();
         cam = FindObjectOfType<cam_controll>();
@@ -41,7 +49,10 @@ public class Player_input : MonoBehaviour {
         sr = GetComponent<SpriteRenderer>();
         set_animator_bools(false, false);
         super_button.SetActive(false);
+        audio = GetComponent<AudioSource>();
 
+        kyu = 0;
+        curr_hp = hp_s[kyu];
     }
 	
 	// Update is called once per frame
@@ -56,7 +67,10 @@ public class Player_input : MonoBehaviour {
             points = 0;
             cam.small_shake();
             cam.zoom(1);
+            curr_hp = hp_s[kyu];
         }
+
+        if(Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
         if (!attacking && idle)
         {
@@ -68,6 +82,7 @@ public class Player_input : MonoBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
+                
                 sr.flipX = false;
                 attack_in_direction(Vector3.left, true, false);
                 
@@ -81,6 +96,7 @@ public class Player_input : MonoBehaviour {
 
             if(Input.GetKeyDown(KeyCode.Space) && absorbs_to_super[kyu] <= absorbs)
             {
+                attacking = true;
                 excecute_super();
             }
         }
@@ -94,6 +110,7 @@ public class Player_input : MonoBehaviour {
         points += p;
         cam.satis_shake();
         absorbs += p;
+        combo++;
         if (absorbs >= absorbs_to_super[kyu]) super_button.SetActive(true);
     }
     public void take_damage()
@@ -105,16 +122,25 @@ public class Player_input : MonoBehaviour {
             
         }
         cam.bad_shake();
-    }
+        curr_hp--;
 
+        if(curr_hp <= 0)
+        {
+            StartCoroutine(game_over());
+        }
+        combo = 0;
+    }
 
     void attack_in_direction(Vector3 dir, bool anim_bool1, bool anim_bool2)
     {
+
         RaycastHit hit;
         if (Physics.Raycast(transform.position, dir, out hit, Mathf.Infinity))
         {
             if (hit.transform.tag == "target_box")
             {
+                audio.clip = sfx[0];
+                audio.Play();
                 set_animator_bools(anim_bool1, anim_bool2);
                 attacking = true;
                 idle = false;
@@ -127,8 +153,11 @@ public class Player_input : MonoBehaviour {
 
     void excecute_super()
     {
+        points += (int)kyu / 2;
         set_animator_bools(true, true);
         absorbs = 0;
+        audio.clip = sfx[1];
+        audio.Play();
         super_button.SetActive(false);
         StartCoroutine(super(100));
         
@@ -196,6 +225,7 @@ public class Player_input : MonoBehaviour {
 
     IEnumerator super(float speed)
     {
+        curr_hp++;
         attacking = true;
         float counter = 0.0f;
         Vector3 target = new Vector3(transform.position.x, 0, transform.position.z);
@@ -219,5 +249,16 @@ public class Player_input : MonoBehaviour {
         
         set_animator_bools(false, false);
 
+    }
+
+    IEnumerator game_over()
+    {
+        audio.clip = sfx[2];
+        audio.Play();
+
+        ani.Play("player_die");
+        yield return new WaitForSeconds(1.5f);
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

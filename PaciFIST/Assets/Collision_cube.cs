@@ -8,20 +8,19 @@ public class Collision_cube : MonoBehaviour {
     bool player_present = false;
     int max_hp = 2;
     int hp = 2;
+
+    AudioSource audio;
 	// Use this for initialization
 
 	void Start () {
         ani = gameObject.GetComponent<Animator>();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     private void OnEnable()
     {
         ani = gameObject.GetComponent<Animator>();
+        audio = gameObject.GetComponent<AudioSource>();
         hp = max_hp;
         ani.SetBool("collided", false);
         ani.Play("Lock_off");
@@ -33,6 +32,10 @@ public class Collision_cube : MonoBehaviour {
         {
             player_present = true;
             ani.SetBool("collided", false);
+            if (hp < max_hp)
+            {
+                audio.Play();
+            }
             hp = max_hp;
         }
     }

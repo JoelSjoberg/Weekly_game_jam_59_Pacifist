@@ -11,7 +11,7 @@ public class text_manipulator : MonoBehaviour {
     public Player_input player;
     public Slider s;
 
-    public bool absorbs, points, kyu_img;
+    public bool absorbs, points, kyu_img, hp, combo;
 
     float limit_width;
 	// Use this for initialization
@@ -34,6 +34,16 @@ public class text_manipulator : MonoBehaviour {
             s.value = (float)player.points / (float)player.absorbs_to_next[player.kyu];
         }
 
+        if (hp)
+        {
+            ui_text.text = "hp: " + player.curr_hp;
+            s.value = (float)player.curr_hp / (float)player.hp_s[player.kyu];
+        }
+
+        if(combo)
+        {
+            ui_text.text = player.combo + "";
+        }
         if (kyu_img)
         {
             if(player.kyu == 11) ui_text.text = "o7 o7";
